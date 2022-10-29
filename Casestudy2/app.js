@@ -39,10 +39,10 @@ app.get('/api/employeelist',async(req,res)=>{
 
 //TODO: get single data from db  using api '/api/employeelist/:id'
 
-app.get('/api/employeelist',async(req,res)=>{
+app.get('/api/employeelist/:id',async(req,res)=>{
     try{
-        employee.findOne({"_id":req.params.id}).then((data)=>{
-            res.send(data);})       
+        var emp = await employee.findOne({"_id":req.params.id});
+            res.send(emp);
     } catch (error) {
         console.log(`Error:${error}`)
     }
@@ -56,8 +56,7 @@ app.post('/api/employeelist',async(req,res)=>{
     try{
         let item = req.body;
         const user = new employee(item);
-        const savedUser = await user.save()
-        res.send(savedUser)        
+        await user.save();
     } catch (error) {
         console.log(`Error:${error}`)
     }
@@ -71,7 +70,7 @@ app.post('/api/employeelist',async(req,res)=>{
 
 app.delete('/api/employeelist/:id',async(req,res)=>{
     try{
-        employee.remove({"_id":req.params.id}).then(()=>{
+        employee.deleteOne({"_id":req.params.id}).then(()=>{
             console.log("Removed");})        
     } catch (error) {
         console.log(`Error:${error}`)
@@ -84,42 +83,19 @@ app.delete('/api/employeelist/:id',async(req,res)=>{
 //TODO: Update  a employee data from db by using api '/api/employeelist'
 //Request body format:{name:'',location:'',position:'',salary:''}
 app.put('/api/employeelist',async(req,res)=>{
-
-    if(req.body.name){
-        if(req.body.location){
-            try{employee.updateOne({"name":req.body.name},
+            try{employee.updateOne({"_id":req.body._id},
         {$set:{
-            "location":req.body.location
+            "name":req.body.name,
+            "position":req.body.position,
+            "location":req.body.location,
+            "salary":req.body.salary
             }}).then(()=>{
                 console.log("Updated")
             })} catch(error){
                 console.log(`Error:${error}`)
             }
-        }
-        if(req.body.position){
-            try{employee.updateOne({"name":req.body.name},
-        {$set:{
-            "position":req.body.position
-        }}).then(()=>{
-                console.log("Updated")
-            })} catch(error){
-                console.log(`Error:${error}`)
-            }
-        }
-        if(req.body.salary){
-            try{employee.updateOne({"name":req.body.name},
-        {$set:{
-            "salary":req.body.salary}}).then(()=>{
-                console.log("Updated")
-            })} catch(error){
-                console.log(`Error:${error}`)
-            }
         }   
-    }
-    
-
-
-})
+)
 
 //! dont delete this code. it connects the front end file.
 app.get('/*', function (req, res) {
